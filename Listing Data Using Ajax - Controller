@@ -1,0 +1,53 @@
+public function index(Request $request)
+    {
+        if ($request->ajax()) {
+            $tableData = Customer::with(
+                'admin',
+                'currency',
+            )->latest();
+            return Datatables::of($tableData)
+                ->addIndexColumn()
+
+                ->addColumn('currency_name', function ($tableData) {
+                    return !empty($tableData->currency) && !empty($tableData->currency->currency) ? $tableData->currency->currency : '';
+                
+                ->addColumn('action', function ($tableData) {
+                    $data = '';
+                    // if ($tableData->admin_id != 0) {
+                    $data = '<div class="table-action d-flex justify-content-start align-items-start">';
+                    if (Auth::user()->can('customer.edit')) {
+                        $data .= '<div class="toolbar-add">
+                            <a href="' . route('tenant.admin.createCustomer', ['id' => encrypt($tableData->id)]) . '" class="add-link action_btn" data-bs-toggle="tooltip" data-placement="top">
+                                    <i class="fa fa-edit"></i>
+                                </a></div>';
+                    }
+                    if (Auth::user()->can('customer.delete')) {
+                        $data .= '<div class="toolbar-add">
+                            <a href="javascript:void(0);" class="action_btn DeleteSalesOrder" title="Delete" data-bs-toggle="modal" data-bs-target="#DeleteSalesOrderModal" data-dltid="' . $tableData->id . '">
+                                    <i class="fa fa-trash"></i>
+                                </a>
+                            </div>';
+                    }
+                    $data .= '</div>';
+                    return $data;
+                    // }
+                })
+                ->rawColumns([
+                    'customer_code',
+                    'currency_name',
+                    'payment_term',
+                    'incoterm_description',
+                    'port_name1',
+                    'port_name2',
+                    'country_name1',
+                    'country_name2',
+                    'adminName', 'action', 'completed', 'flag'
+                ])
+                ->make(true);
+        }
+        $data['breadcrumbName'] = $data['pageName'] = $data['title'] = "Customer Master List";
+
+        $data['customerLists'] = Customer::orderBy('id', 'DESC')->get();
+
+        return view('admin.customer.index', $data);
+}
