@@ -1,0 +1,25 @@
+$(function() {
+        var table = $('#TableFeatures').DataTable({
+            // order: [
+            //     [0, 'desc']
+            // ],
+            scrollX: true,
+            processing: true,
+            serverSide: true,
+            ajax: "{{ route('tenant.admin.customerList') }}",
+            columns: [
+                {data: 'id',name: 'id'},
+                {data: 'costomer_code', name: 'costomer_code' ,searchable: true},
+                {data: 'customer_name', name: 'customer_name' ,searchable: true},
+                {data: 'customer_email', name: 'customer_email' ,searchable: true},
+                {data: 'currency_name', name: 'currency_name' ,searchable: true},
+                {data: 'payment_term', name: 'payment_term' ,searchable: true},
+                {
+                    data: 'action',
+                    name: 'action',
+                    orderable: false,
+                    searchable: false
+                }
+            ]
+        });
+    });
